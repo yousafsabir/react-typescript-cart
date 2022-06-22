@@ -1,18 +1,22 @@
 import React, { createContext, FC, useContext, useState } from "react";
 
-const CartContext = createContext({});
+type CartItem = {
+    id: number;
+    qty: number;
+};
 
 type CartTypes = {
     getItemQty: (id: number) => number;
     increaseQty: (id: number) => void;
     decreaseQty: (id: number) => void;
     removeItem: (id: number) => void;
+    openCart: () => void;
+    closeCart: () => void;
+    cartQty: number;
+    cartItems: CartItem[];
 };
 
-type CartItem = {
-    id: number;
-    qty: number;
-};
+const CartContext = createContext({} as CartTypes);
 
 export const useCart = () => {
     return useContext(CartContext);
@@ -24,6 +28,13 @@ interface Props {
 
 export const CartProvider: FC<Props> = ({ children }) => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+
+    const openCart = () => setIsOpen(true);
+
+    const closeCart = () => setIsOpen(false);
+
+    const cartQty = cartItems.reduce((qty, item) => item.qty + qty, 0);
 
     const getItemQty = (id: number) => {
         return cartItems.find((item) => item.id === id)?.qty || 0;
@@ -31,12 +42,12 @@ export const CartProvider: FC<Props> = ({ children }) => {
 
     const increaseQty = (id: number) => {
         setCartItems((items) => {
-            if (items.find((item) => item.id === id) === null) {
+            if (items.find((item) => item.id === id) == null) {
                 return [...items, { id, qty: 1 }];
             } else {
                 return items.map((item) => {
                     if (item.id === id) {
-                        return { ...item, quantity: item.qty + 1 };
+                        return { ...item, qty: item.qty + 1 };
                     } else {
                         return item;
                     }
@@ -67,7 +78,16 @@ export const CartProvider: FC<Props> = ({ children }) => {
 
     return (
         <CartContext.Provider
-            value={{ getItemQty, increaseQty, decreaseQty, removeItem }}
+            value={{
+                getItemQty,
+                increaseQty,
+                decreaseQty,
+                removeItem,
+                openCart,
+                closeCart,
+                cartQty,
+                cartItems,
+            }}
         >
             {children}
         </CartContext.Provider>
