@@ -1,4 +1,5 @@
 import React, { createContext, FC, useContext, useState } from "react";
+import Cart from "../components/Cart";
 
 type CartItem = {
     id: number;
@@ -12,6 +13,7 @@ type CartTypes = {
     removeItem: (id: number) => void;
     openCart: () => void;
     closeCart: () => void;
+    isOpen: boolean;
     cartQty: number;
     cartItems: CartItem[];
 };
@@ -87,9 +89,11 @@ export const CartProvider: FC<Props> = ({ children }) => {
                 closeCart,
                 cartQty,
                 cartItems,
+                isOpen,
             }}
         >
             {children}
+            <Cart />
         </CartContext.Provider>
     );
 };
